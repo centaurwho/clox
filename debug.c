@@ -4,8 +4,6 @@
 #include "value.h"
 
 
-
-
 void dissassembleChunk(Chunk* chunk, const char* name) {
   printf("== %s ==\n", name);
 
@@ -29,6 +27,12 @@ static int simpleInstr(const char* name, int off) {
 
 int dissassembleInstr(Chunk* chunk, int off) {
   printf("%04d ", off);
+
+  if (off > 0 && chunk->lines[off] == chunk->lines[off-1]) {
+    printf("   | ");
+  } else {
+    printf("%4d ", chunk->lines[off]);
+  }
 
   uint8_t instr = chunk->code[off];
   switch (instr) {
