@@ -8,27 +8,20 @@
 // pass it around.
 VM vm;
 
-static void resetStack() {
-  vm.top = vm.stack;
-}
-
 void initVM() {
-  resetStack();
+  resetStack(&vm.stack);
 }
 
 void freeVM() {
 
 }
 
-// TODO: edge cases in push and pop
-void push(Value val) {
-  *vm.top = val;
-  vm.top++;
+static Value popVal() {
+  return pop(&vm.stack);
 }
 
-Value pop() {
-  vm.top--;
-  return *vm.top;
+static void pushVal(Value val) {
+  push(&vm.stack, val);
 }
 
 // TODO: Direct Threaded Code, Jump Table, Computed Goto.
@@ -40,26 +33,22 @@ static InterpretResult run() {
 
   #define BINARY_OP(op) \
     do { \
-      double b = pop(); \
-      double a = pop(); \
-      push(a op b); \
+      double b = popVal(); \
+      double a = popVal(); \
+      pushVal(a op b); \
     } while (false)
 
   for (;;) {
 #ifdef DEBUG_TRACE_EXEC
     printf("    ");
-    for (Value* slot = vm.stack; slot < vm.top; slot++) {
-      printf("[ ");
-      printValue(*slot);
-      printf(" ]");
-    }
+    printStack(&vm.stack);
     printf("\n");
     dissassembleInstr(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
     uint8_t instr;
     switch (instr = READ_BYTE()) {
       case OP_NEGATE: 
-        push(-pop()); 
+        pushVal(-popVal()); 
         break;
       case OP_ADD:
         BINARY_OP(+); 
@@ -74,11 +63,11 @@ static InterpretResult run() {
         BINARY_OP(/); 
         break;
       case OP_RETURN: 
-        printValue(pop());
+        printValue(popVal());
         printf("\n");
         return INTERPRET_OK;
       case OP_CONSTANT:  
-        push(READ_CONSTANT());
+        pushVal(READ_CONSTANT());
         break;
       
     }
