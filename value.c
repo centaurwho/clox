@@ -13,7 +13,7 @@ void initValueArray(ValueArray* array) {
 }
 
 // Write the constant to the value array
-void writeValueArray(ValueArray* array, uint8_t byte) {
+void writeValueArray(ValueArray* array, Value val) {
   if (array->capacity < array->count + 1) {
     // capacity is not enough. Grow
     int oldCap = array->capacity;
@@ -23,13 +23,13 @@ void writeValueArray(ValueArray* array, uint8_t byte) {
   }
 
   // Do the actual writing.
-  array->values[array->count] = byte;
+  array->values[array->count] = val;
   array->count++;
 }
 
 // Free the value array and reset 
 void freeValueArray(ValueArray* array) {
-  FREE_ARRAY(uint8_t, array->values, array->capacity);
+  FREE_ARRAY(Value, array->values, array->capacity);
   initValueArray(array);
 }
 

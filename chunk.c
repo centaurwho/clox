@@ -24,7 +24,7 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
         chunk->capacity); 
   }
   // TODO: If lines are not in increasing order this logic fails.
-  if (chunk->lastLine != line) {    
+  if (chunk->lastLine < line) {    
     chunk->lines = GROW_ARRAY(chunk->lines, int, chunk->lastLine, line);
     for (int i = chunk->lastLine; i <= line; i++) {
       chunk->lines[i] = 0;
@@ -55,9 +55,6 @@ int getLine(Chunk* chunk, int off) {
   const int* lines = chunk->lines;
   int i = 0;
   for (int sum = 0; sum <= off && i < chunk->lastLine; i++) {
-    if (sum > off) {
-      break;
-    }
     sum += lines[i];
   }
   return i;
