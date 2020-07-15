@@ -23,6 +23,16 @@ static int constInstr(const char* name, Chunk* chunk, int off) {
   return off + 2;
 }
 
+// Print OP_CONSTANT_LONG
+static int constLongInstr(const char* name, Chunk* chunk, int off) {
+  uint32_t constant = (chunk->code[off+1] >> 16) 
+    + (chunk->code[off+2] >> 8) + chunk->code[off+3];
+  printf("%-16s %4d '", name, constant);
+  printValue(chunk->constants.values[constant]);
+  printf("'\n");
+  return off + 4;
+}
+
 // Print simple instructions (OP_RETURN etc.)
 static int simpleInstr(const char* name, int off) {
   printf("%s\n", name);
@@ -53,6 +63,8 @@ int dissassembleInstr(Chunk* chunk, int off) {
   switch (instr) {
     case OP_CONSTANT:
       return constInstr("OP_CONSTANT", chunk, off);
+    case OP_CONSTANT_LONG:
+      return constLongInstr("OP_CONSTANT_LONG", chunk, off);
     case OP_RETURN:
       return simpleInstr("OP_RETURN", off);
     default:

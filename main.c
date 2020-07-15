@@ -12,11 +12,9 @@ int main(int argc, const char* argv[]) {
   // chunk.lines = l; 
   // chunk.lastLine = 4;
 
-  int constant = addConstant(&chunk, 1.2);
-  writeChunk(&chunk, OP_CONSTANT, 12);
-  writeChunk(&chunk, constant, 12);
+  writeConstant(&chunk, 12.3, 4);
 
-  writeChunk(&chunk, OP_RETURN, 12);  
+  writeChunk(&chunk, OP_RETURN, 4);  
   dissassembleChunk(&chunk, "test_chunk");
   freeChunk(&chunk);  
   

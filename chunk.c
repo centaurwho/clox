@@ -23,7 +23,6 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
     chunk->code = GROW_ARRAY(chunk->code, uint8_t, oldCap, 
         chunk->capacity); 
   }
-  // TODO: If lines are not in increasing order this logic fails.
   if (chunk->lastLine < line) {    
     chunk->lines = GROW_ARRAY(chunk->lines, int, chunk->lastLine, line);
     for (int i = chunk->lastLine; i <= line; i++) {
@@ -40,6 +39,15 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
 int addConstant(Chunk* chunk, Value val) {
   writeValueArray(&chunk->constants, val);
   return chunk->constants.count - 1;
+}
+
+// Adds a long constant to the chunk
+void writeConstant(Chunk* chunk, Value val, int line) {
+  writeChunk(chunk, OP_CONSTANT_LONG, line);
+  int cons = addConstant(chunk, val);
+  writeChunk(chunk, cons >> 16, line);
+  writeChunk(chunk, (cons >> 8) | 0xff00, line);
+  writeChunk(chunk, (uint8_t) cons, line);
 }
 
 // Free the chunk and its contents and reset
