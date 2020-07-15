@@ -4,14 +4,17 @@
 #include "value.h"
 
 
+// Pretty print the chunk. 
 void dissassembleChunk(Chunk* chunk, const char* name) {
   printf("== %s ==\n", name);
 
+  // Instruction lengths are not all same. Iterate cumulatively
   for (int off = 0; off < chunk->count;) {
     off = dissassembleInstr(chunk, off);
   }
 }
 
+// Print OP_CONSTANT
 static int constInstr(const char* name, Chunk* chunk, int off) {
   uint8_t constant = chunk->code[off+1];
   printf("%-16s %4d '", name, constant);
@@ -20,20 +23,32 @@ static int constInstr(const char* name, Chunk* chunk, int off) {
   return off + 2;
 }
 
+// Print simple instructions (OP_RETURN etc.)
 static int simpleInstr(const char* name, int off) {
   printf("%s\n", name);
   return off + 1;
 }
 
+void dissassLine(Chunk* chunk, int off) {
+  int currLine = getLine(chunk, off);
+  if (off > 0) {
+    int prevLine = getLine(chunk, off - 1);
+    if (currLine == prevLine) {
+      printf("   | ");
+    }
+  } else {
+    printf("%4d ", currLine);
+  }
+}
+
+// Print the instruction starting in off
 int dissassembleInstr(Chunk* chunk, int off) {
   printf("%04d ", off);
 
-  if (off > 0 && chunk->lines[off] == chunk->lines[off-1]) {
-    printf("   | ");
-  } else {
-    printf("%4d ", chunk->lines[off]);
-  }
+  // Print the line
+  dissassLine(chunk, off);
 
+  // Pass to relevant function
   uint8_t instr = chunk->code[off];
   switch (instr) {
     case OP_CONSTANT:
@@ -45,3 +60,4 @@ int dissassembleInstr(Chunk* chunk, int off) {
       return off + 1;
   }
 }
+

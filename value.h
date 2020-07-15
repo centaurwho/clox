@@ -6,6 +6,7 @@
 // TODO: Generify with array struct and functions
 typedef double Value;
 
+// Keeps constants in the program
 typedef struct {
   int capacity;
   int count;
