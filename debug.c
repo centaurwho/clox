@@ -24,9 +24,9 @@ static int constInstr(const char* name, Chunk* chunk, int off) {
 }
 
 // Print OP_CONSTANT_LONG
-static int constLongInstr(const char* name, Chunk* chunk, int off) {
-  uint32_t constant = (chunk->code[off+1] >> 16) 
-    + (chunk->code[off+2] >> 8) + chunk->code[off+3];
+static int constLongInstr(const char* name, Chunk* chunk, int off) { 
+  uint32_t constant = (chunk->code[off+1] << 16) 
+    + (chunk->code[off+2] << 8) + chunk->code[off+3];
   printf("%-16s %4d '", name, constant);
   printValue(chunk->constants.values[constant]);
   printf("'\n");

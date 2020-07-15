@@ -43,11 +43,16 @@ int addConstant(Chunk* chunk, Value val) {
 
 // Adds a long constant to the chunk
 void writeConstant(Chunk* chunk, Value val, int line) {
-  writeChunk(chunk, OP_CONSTANT_LONG, line);
   int cons = addConstant(chunk, val);
-  writeChunk(chunk, cons >> 16, line);
-  writeChunk(chunk, (cons >> 8) | 0xff00, line);
-  writeChunk(chunk, (uint8_t) cons, line);
+  if (cons < 256) {
+    writeChunk(chunk, OP_CONSTANT, line);
+    writeChunk(chunk, (uint8_t) cons, line);
+  } else {
+    writeChunk(chunk, OP_CONSTANT_LONG, line);
+    writeChunk(chunk, (uint8_t) (cons >> 16) & 0xff, line);
+    writeChunk(chunk, (uint8_t) (cons >> 8) & 0xff, line);
+    writeChunk(chunk, (uint8_t) cons, line);
+  }
 }
 
 // Free the chunk and its contents and reset
