@@ -65,6 +65,14 @@ int dissassembleInstr(Chunk* chunk, int off) {
       return constInstr("OP_CONSTANT", chunk, off);
     case OP_CONSTANT_LONG:
       return constLongInstr("OP_CONSTANT_LONG", chunk, off);
+    case OP_ADD:
+      return simpleInstr("OP_ADD", off);
+    case OP_SUBTRACT:
+      return simpleInstr("OP_SUBTRACT", off);
+    case OP_MULTIPLY:
+      return simpleInstr("OP_MULTIPLY", off);
+    case OP_DIVIDE:
+      return simpleInstr("OP_DIVIDE", off);
     case OP_NEGATE:
       return simpleInstr("OP_NEGATE", off);
     case OP_RETURN:

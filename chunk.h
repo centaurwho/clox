@@ -8,8 +8,12 @@
 typedef enum {
   OP_RETURN,
   OP_CONSTANT,
-  OP_NEGATE,
   OP_CONSTANT_LONG,
+  OP_ADD,
+  OP_SUBTRACT,
+  OP_MULTIPLY,
+  OP_DIVIDE,
+  OP_NEGATE,
 } OpCode;
 
 // Main guy. Responsible for all relevant data
