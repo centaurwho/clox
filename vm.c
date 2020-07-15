@@ -8,12 +8,27 @@
 // pass it around.
 VM vm;
 
-void initVM() {
+static void resetStack() {
+  vm.top = vm.stack;
+}
 
+void initVM() {
+  resetStack();
 }
 
 void freeVM() {
 
+}
+
+// TODO: edge cases in push and pop
+void push(Value val) {
+  *vm.top = val;
+  vm.top++;
+}
+
+Value pop() {
+  vm.top--;
+  return *vm.top;
 }
 
 // TODO: Direct Threaded Code, Jump Table, Computed Goto.
@@ -24,19 +39,29 @@ static InterpretResult run() {
   #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
   for (;;) {
-#ifndef DEBUG_TRACE_EXEC
-    dissassembleInstr(vm.chunk, (int)(vm.ip - vm.chunk->code))
+#ifdef DEBUG_TRACE_EXEC
+    printf("    ");
+    for (Value* slot = vm.stack; slot < vm.top; slot++) {
+      printf("[ ");
+      printValue(*slot);
+      printf(" ]");
+    }
+    printf("\n");
+    dissassembleInstr(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
     uint8_t instr;
     switch (instr = READ_BYTE()) {
-      case OP_RETURN: 
-        return INTERPRET_OK;
-      case OP_CONSTANT: { 
-        Value constant = READ_CONSTANT();
-        printValue(constant);
-        printf("\n");
+      case OP_NEGATE: 
+        push(-pop()); 
         break;
-      }
+      case OP_RETURN: 
+        printValue(pop());
+        printf("\n");
+        return INTERPRET_OK;
+      case OP_CONSTANT:  
+        push(READ_CONSTANT());
+        break;
+      
     }
   }
   #undef READ_BYTE 

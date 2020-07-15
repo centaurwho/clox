@@ -15,6 +15,7 @@ int main(int argc, const char* argv[]) {
   
   writeChunk(&chunk, OP_CONSTANT, 4);
   writeChunk(&chunk, constant, 4);
+  writeChunk(&chunk, OP_NEGATE, 4);
   writeChunk(&chunk, OP_RETURN, 4);
   dissassembleChunk(&chunk, "test_chunk");
   interpret(&chunk);
