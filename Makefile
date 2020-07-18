@@ -1,2 +1,16 @@
-all:
-	gcc main.c vm.c chunk.c stack.c value.c memory.c debug.c compiler.c scanner.c
+SDIR := src
+IDIR := include
+
+SFILES := $(wildcard $(SDIR)/*.c)
+IFILES := $(wildcard $(IDIR)/*.h)
+
+CC=gcc
+CFLAGS := -I
+
+ONAME := clox
+
+clox: $(IFILES)
+	$(CC) $(CFLAGS) $(IDIR) -o $(ONAME) $(SFILES)
+
+clean:
+	rm -rf clox *.out
