@@ -35,5 +35,5 @@ void freeValueArray(ValueArray* array) {
 
 // For now values are all doubles. Just print
 void printValue(Value val) {
-  printf("%g", val);
+  printf("%g", AS_NUM(val));
 }

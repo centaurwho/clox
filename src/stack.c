@@ -7,8 +7,8 @@
 void resetStack(Stack* stack) {
   stack->capacity = 0;
   stack->count = 0;
-  stack->top = NULL;
   stack->arr = NULL;
+  stack->top = stack->arr;
 }
 
 void push(Stack* stack, Value val) {

@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "common.h"
@@ -17,8 +18,24 @@ void freeVM() {
 
 }
 
+static void runtimeErr(const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+  vfprintf(stderr, format, args);
+  va_end(args);
+  fputs("\n", stderr);
+
+  size_t instr = vm.ip - vm.chunk->code - 1;
+  int line = getLine(vm.chunk, -instr);
+  fprintf(stderr, "[line %d] in script\n", line);
+}
+
 static Value popVal() {
   return pop(&vm.stack);
+}
+
+static Value peek(int dist) {
+  return vm.stack.top[-dist];
 }
 
 static void pushVal(Value val) {
@@ -32,11 +49,15 @@ static InterpretResult run() {
   // TODO: handle reading long constants?
   #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
-  #define BINARY_OP(op) \
+  #define BINARY_OP(type, op) \
     do { \
-      double b = popVal(); \
-      double a = popVal(); \
-      pushVal(a op b); \
+      if (!IS_NUM(peek(0)) || !(IS_NUM(peek(1)))) { \
+        runtimeErr("Operands must be numbers"); \
+        return INTERPRET_RUNTIME_ERROR; \
+      } \
+      double b = AS_NUM(popVal()); \
+      double a = AS_NUM(popVal()); \
+      pushVal(type(a op b)); \
     } while (false)
 
   for (;;) {
@@ -48,20 +69,24 @@ static InterpretResult run() {
 #endif
     uint8_t instr;
     switch (instr = READ_BYTE()) {
-      case OP_NEGATE: 
-        pushVal(-popVal()); 
+      case OP_NEGATE:
+        if (!IS_NUM(peek(0))) {
+          runtimeErr("Operand must be a number");
+          return INTERPRET_RUNTIME_ERROR;
+        }  
+        pushVal(NUM_VAL(-AS_NUM(popVal()))); 
         break;
       case OP_ADD:
-        BINARY_OP(+); 
+        BINARY_OP(NUM_VAL, +); 
         break;
       case OP_SUBTRACT:
-        BINARY_OP(-); 
+        BINARY_OP(NUM_VAL, -); 
         break;
       case OP_MULTIPLY:
-        BINARY_OP(*); 
+        BINARY_OP(NUM_VAL, *); 
         break;
       case OP_DIVIDE:
-        BINARY_OP(/); 
+        BINARY_OP(NUM_VAL, /); 
         break;
       case OP_RETURN: 
         printValue(popVal());
