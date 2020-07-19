@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "object.h"
 #include "value.h"
 #include "memory.h"
 
@@ -15,6 +17,12 @@ bool valuesEq(Value a, Value b) {
       return true;
     case VAL_NUM:
       return AS_NUM(a) == AS_NUM(b);
+    case VAL_OBJ: {
+      ObjStr* stra = AS_STRING(a);
+      ObjStr* strb = AS_STRING(b);
+      return stra->len == strb->len && memcmp(stra->chars, strb->chars,
+          stra->len) == 0;
+    }
   }
   return false; // Can not reach here but c warns me somehow
 }
@@ -58,6 +66,9 @@ void printValue(Value val) {
       break;
     case VAL_NUM:
       printf("%g", AS_NUM(val));
+      break;
+    case VAL_OBJ:
+      printObj(val);
       break;
   }
 }

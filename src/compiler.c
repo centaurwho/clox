@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "compiler.h"
+#include "object.h"
 #include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
@@ -205,6 +206,12 @@ static void number() {
   emitConstant(NUM_VAL(val));
 }
 
+// TODO: Escape characters should be treated around here
+static void string() {
+  emitConstant(OBJ_VAL(copyStr(parser.prev.start+1, 
+          parser.prev.len - 2)));
+}
+
 static void unary() {
   TokenType opType = parser.prev.type;
 
@@ -245,7 +252,7 @@ ParseRule rules[] = {
   [TOKEN_LESS] = {NULL, binary, PREC_COMP},
   [TOKEN_LESS_EQUAL] = {NULL, binary, PREC_COMP},
   [TOKEN_ID] = {NULL, NULL, PREC_NONE},
-  [TOKEN_STRING] = {NULL, NULL, PREC_NONE},
+  [TOKEN_STRING] = {string, NULL, PREC_NONE},
   [TOKEN_NUMBER] = {number, NULL, PREC_NONE},
   [TOKEN_AND] = {NULL, NULL, PREC_NONE},
   [TOKEN_CLASS] = {NULL, NULL, PREC_NONE},

@@ -3,6 +3,9 @@
  
 #include "common.h"
 
+#define ALLOCATE(type, count) \
+  (type*) reallocate(NULL, 0, sizeof(type) * count);
+
 // Start the capacity from 8 and when it is no longer enough, just 
 // double it.
 #define GROW_CAPACITY(capacity) \

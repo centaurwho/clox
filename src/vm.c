@@ -1,10 +1,13 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "common.h"
 #include "compiler.h"
-#include "vm.h"
 #include "debug.h"
+#include "object.h"
+#include "memory.h"
+#include "vm.h"
 
 // Global Virtual Machine object. Could have used a VM pointer and
 // pass it around.
@@ -34,6 +37,10 @@ static Value popVal() {
   return pop(&vm.stack);
 }
 
+static void pushVal(Value val) {
+  push(&vm.stack, val);
+}
+
 static Value peek(int dist) {
   return vm.stack.top[-dist];
 }
@@ -42,9 +49,21 @@ static bool isFalsey(Value val) {
   return IS_NIL(val) || (IS_BOOL(val) && !AS_BOOL(val));
 }
 
-static void pushVal(Value val) {
-  push(&vm.stack, val);
+static void concat() {
+  ObjStr* b = AS_STRING(popVal());
+  ObjStr* a = AS_STRING(popVal());
+
+  int len = a->len + b->len;
+  char* chars = ALLOCATE(char, len + 1);
+  memcpy(chars, a->chars, a->len);
+  memcpy(chars + a->len, b->chars, b->len);
+  chars[len] = '\0';
+
+  ObjStr* res = takeStr(chars, len);
+  pushVal(OBJ_VAL(res));
 }
+
+
 
 // TODO: Direct Threaded Code, Jump Table, Computed Goto.
 // For increasing efficiency of bytecode dispatch
@@ -80,8 +99,18 @@ static InterpretResult run() {
         }  
         pushVal(NUM_VAL(-AS_NUM(popVal()))); 
         break;
+      // TODO: Seperate string concat and addition
       case OP_ADD:
-        BINARY_OP(NUM_VAL, +); 
+        if (IS_STRING(peek(0)) && IS_STRING(peek(1))) {
+          concat();
+        } else if (IS_NUM(peek(0)) && IS_NUM(peek(1))) {
+          double b = AS_NUM(popVal());
+          double a = AS_NUM(popVal());
+          pushVal(NUM_VAL(a + b));
+        } else {
+          runtimeErr("Operands must be two strings or two nums"); 
+          return INTERPRET_RUNTIME_ERROR;
+        }
         break;
       case OP_SUBTRACT:
         BINARY_OP(NUM_VAL, -); 
