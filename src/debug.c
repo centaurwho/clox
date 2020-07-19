@@ -79,6 +79,8 @@ int dissassembleInstr(Chunk* chunk, int off) {
       return simpleInstr("OP_MULTIPLY", off);
     case OP_DIVIDE:
       return simpleInstr("OP_DIVIDE", off);
+    case OP_NOT:
+      return simpleInstr("OP_NOT", off);
     case OP_NEGATE:
       return simpleInstr("OP_NEGATE", off);
     case OP_RETURN:

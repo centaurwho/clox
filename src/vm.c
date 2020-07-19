@@ -38,6 +38,10 @@ static Value peek(int dist) {
   return vm.stack.top[-dist];
 }
 
+static bool isFalsey(Value val) {
+  return IS_NIL(val) || (IS_BOOL(val) && !AS_BOOL(val));
+}
+
 static void pushVal(Value val) {
   push(&vm.stack, val);
 }
@@ -87,6 +91,9 @@ static InterpretResult run() {
         break;
       case OP_DIVIDE:
         BINARY_OP(NUM_VAL, /); 
+        break;
+      case OP_NOT:
+        pushVal(BOOL_VAL(isFalsey(popVal())));
         break;
       case OP_RETURN: 
         printValue(popVal());
