@@ -95,7 +95,15 @@ static InterpretResult run() {
       case OP_CONSTANT:  
         pushVal(READ_CONSTANT());
         break;
-      
+      case OP_NIL:
+        pushVal(NIL_VAL);
+        break;
+      case OP_TRUE:
+        pushVal(BOOL_VAL(true));
+        break;
+      case OP_FALSE:
+        pushVal(BOOL_VAL(false));
+        break;
     }
   }
   #undef READ_BYTE 

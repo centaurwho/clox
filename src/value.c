@@ -35,5 +35,15 @@ void freeValueArray(ValueArray* array) {
 
 // For now values are all doubles. Just print
 void printValue(Value val) {
-  printf("%g", AS_NUM(val));
+  switch (val.type) {
+    case VAL_BOOL:
+      printf(AS_BOOL(val) ? "true" : "false");
+      break;
+    case VAL_NIL:
+      printf("nil");
+      break;
+    case VAL_NUM:
+      printf("%g", AS_NUM(val));
+      break;
+  }
 }
