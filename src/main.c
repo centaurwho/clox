@@ -58,9 +58,11 @@ static void runFile(const char* filepath) {
   free(source);
 
   if (result == INTERPRET_COMPILE_ERROR) {
+    fprintf(stderr, "Compile error\n");
     exit(65);
   }
   if (result == INTERPRET_RUNTIME_ERROR) {
+    fprintf(stderr, "Runtime error\n");
     exit(70);
   }
 }

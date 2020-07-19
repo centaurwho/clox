@@ -76,6 +76,7 @@ static void advance() {
 
   for (;;) {
     parser.curr = scanToken();
+    // printToken(&parser.curr);
     if (parser.curr.type != TOKEN_ERROR) {
       break;
     }
@@ -193,11 +194,11 @@ ParseRule rules[] = {
   [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
   [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
   [TOKEN_DOT] = {NULL, NULL, PREC_NONE},
-  [TOKEN_MINUS] = {unary, binary, PREC_NONE},
-  [TOKEN_PLUS] = {NULL, binary, PREC_NONE},
+  [TOKEN_MINUS] = {unary, binary, PREC_TERM},
+  [TOKEN_PLUS] = {NULL, binary, PREC_TERM},
   [TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
-  [TOKEN_SLASH] = {NULL, binary, PREC_NONE},
-  [TOKEN_STAR] = {NULL, binary, PREC_NONE},
+  [TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
+  [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
   [TOKEN_BANG] = {NULL, NULL, PREC_NONE},
   [TOKEN_BANG_EQUAL] = {NULL, NULL, PREC_NONE},
   [TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},

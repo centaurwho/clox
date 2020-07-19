@@ -9,7 +9,7 @@ CFLAGS := -I
 
 ONAME := clox
 
-clox: $(IFILES)
+clox: $(IFILES) $(SFILES)
 	$(CC) $(CFLAGS) $(IDIR) -o $(ONAME) $(SFILES)
 
 clean:
