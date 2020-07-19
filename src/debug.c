@@ -71,6 +71,12 @@ int dissassembleInstr(Chunk* chunk, int off) {
       return simpleInstr("OP_TRUE", off);
     case OP_FALSE:
       return simpleInstr("OP_FALSE", off);
+    case OP_EQUAL:
+      return simpleInstr("OP_EQUAL", off);
+    case OP_GREATER:
+      return simpleInstr("OP_GREATER", off);
+    case OP_LESS:
+      return simpleInstr("OP_LESS", off);
     case OP_ADD:
       return simpleInstr("OP_ADD", off);
     case OP_SUBTRACT:

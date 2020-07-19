@@ -38,6 +38,7 @@ typedef struct {
   Value* values;
 } ValueArray;
 
+bool valuesEq(Value a, Value b);
 void initValueArray(ValueArray* array);
 void writeValueArray(ValueArray* array, Value val);
 void freeValueArray(ValueArray* array);

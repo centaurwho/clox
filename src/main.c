@@ -8,6 +8,19 @@
 #include "debug.h"
 #include "vm.h"
 
+void runCode(const char* source) {
+  InterpretResult result = interpret(source);
+
+  if (result == INTERPRET_COMPILE_ERROR) {
+    fprintf(stderr, "Compile error\n");
+    exit(65);
+  }
+  if (result == INTERPRET_RUNTIME_ERROR) {
+    fprintf(stderr, "Runtime error\n");
+    exit(70);
+  }
+}
+
 static void repl() {
   char line[1024];
 
@@ -18,8 +31,10 @@ static void repl() {
       printf("\n");
       break;
     }
+    runCode(line);
   }
 }
+
 
 static char* readFile(const char* filepath) {
   FILE* file = fopen(filepath, "rb");
@@ -54,17 +69,8 @@ static char* readFile(const char* filepath) {
 
 static void runFile(const char* filepath) {
   char* source = readFile(filepath);
-  InterpretResult result = interpret(source);
+  runCode(source);
   free(source);
-
-  if (result == INTERPRET_COMPILE_ERROR) {
-    fprintf(stderr, "Compile error\n");
-    exit(65);
-  }
-  if (result == INTERPRET_RUNTIME_ERROR) {
-    fprintf(stderr, "Runtime error\n");
-    exit(70);
-  }
 }
 
 int main(int argc, const char* argv[]) {

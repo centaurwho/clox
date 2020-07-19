@@ -111,6 +111,18 @@ static InterpretResult run() {
       case OP_FALSE:
         pushVal(BOOL_VAL(false));
         break;
+      case OP_EQUAL: {
+        Value b = popVal();
+        Value a = popVal();
+        pushVal(BOOL_VAL(valuesEq(a, b)));
+        break;
+      }
+      case OP_GREATER:
+        BINARY_OP(BOOL_VAL, >);
+        break;
+      case OP_LESS:
+        BINARY_OP(BOOL_VAL, <);
+        break;
     }
   }
   #undef READ_BYTE 
