@@ -12,6 +12,10 @@
 static Obj* allocateObj(size_t size, ObjType type) {
   Obj* obj = (Obj*)reallocate(NULL, 0, size);
   obj->type = type;
+
+  // Add object to virtual machines linked list.
+  obj->next = vm.objects;
+  vm.objects = obj;
   return obj;
 }
 

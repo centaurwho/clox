@@ -15,10 +15,11 @@ VM vm;
 
 void initVM() {
   resetStack(&vm.stack);
+  vm.objects = NULL;
 }
 
 void freeVM() {
-
+  freeObjects();
 }
 
 static void runtimeErr(const char* format, ...) {
