@@ -2,12 +2,14 @@
 #define clox_vm_h
 
 #include "chunk.h"
+#include "table.h"
 #include "stack.h"
 
 typedef struct {
   Chunk* chunk;
   uint8_t* ip; // Keep instruction pointer here.
   Stack stack;
+  Table strings;
   Obj* objects;
 } VM;
 

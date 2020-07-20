@@ -119,5 +119,25 @@ bool delEntry(Table* table, ObjStr* key) {
   entry->key = NULL;
   entry->val = BOOL_VAL(true);
   return true;
+}
 
+ObjStr* tableFindStr(Table* table, const char* chars, int len, 
+    uint32_t hash) {
+  if (table->count == 0) {
+    return NULL;
+  }
+  uint32_t index = hash % table->capacity;
+  for (;;) {
+    Entry* entry = &table->entries[index];
+
+    if (entry->key == NULL) {
+      if (IS_NIL(entry->val)) {
+        return NULL;
+      }
+    } else if (entry->key->len == len && entry->key->hash == hash &&
+        memcmp(entry->key->chars, chars, len) == 0) {
+      return entry->key; 
+    }
+    index = (index + 1) % table->capacity;
+  }
 }

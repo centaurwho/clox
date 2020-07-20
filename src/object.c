@@ -3,6 +3,7 @@
 
 #include "memory.h"
 #include "object.h"
+#include "table.h"
 #include "value.h"
 #include "vm.h"
 
@@ -24,6 +25,7 @@ static ObjStr* allocateStr(char* chars, int len, uint32_t hash) {
   str->len = len;
   str->chars = chars;
   str->hash = hash;
+  addEntry(&vm.strings, str, NIL_VAL);
   return str;
 }
 
@@ -40,11 +42,20 @@ static uint32_t hashStr(const char* key, int len) {
 
 ObjStr* takeStr(char* chars, int len) {
   uint32_t hash = hashStr(chars, len);
+  ObjStr* interned = tableFindStr(&vm.strings, chars, len, hash);
+  if (interned != NULL) {
+    FREE_ARRAY(char, chars, len + 1);
+    return interned;
+  }
   return allocateStr(chars, len, hash);
 }
 
 ObjStr* copyStr(const char* chars, int len) {
   uint32_t hash = hashStr(chars, len);
+  ObjStr* interned = tableFindStr(&vm.strings, chars, len, hash);
+  if (interned != NULL) {
+    return interned;
+  }
   char* heapChars = ALLOCATE(char, len + 1);
   memcpy(heapChars, chars, len);
   heapChars[len] = '\0';

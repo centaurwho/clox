@@ -21,5 +21,7 @@ bool addEntry(Table* table, ObjStr* key, Value val);
 bool getEntry(Table* table, ObjStr* key, Value* val);
 bool delEntry(Table* table, ObjStr* key);
 void copyTable(Table* from, Table* to);
+ObjStr* tableFindStr(Table* table, const char* chars, int len, 
+    uint32_t hash);
 
 #endif

@@ -17,12 +17,8 @@ bool valuesEq(Value a, Value b) {
       return true;
     case VAL_NUM:
       return AS_NUM(a) == AS_NUM(b);
-    case VAL_OBJ: {
-      ObjStr* stra = AS_STRING(a);
-      ObjStr* strb = AS_STRING(b);
-      return stra->len == strb->len && memcmp(stra->chars, strb->chars,
-          stra->len) == 0;
-    }
+    case VAL_OBJ: 
+      return AS_OBJ(a) == AS_OBJ(b);
   }
   return false; // Can not reach here but c warns me somehow
 }
