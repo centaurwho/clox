@@ -1,0 +1,3 @@
+var a = "hako";
+var b = "pako" + a;
+print b;

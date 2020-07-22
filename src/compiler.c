@@ -162,7 +162,6 @@ static void defineVar(uint8_t global) {
   emitBytes(OP_DEF_GLOBAL, global);
 }
 
-
 static void binary() {
   // store the operator
   TokenType opType = parser.prev.type;
@@ -240,6 +239,15 @@ static void string() {
           parser.prev.len - 2)));
 }
 
+static void namedVar(Token name) {
+  uint8_t arg = idConstant(&name);
+  emitBytes(OP_GET_GLOBAL, arg);
+}
+
+static void variable() {
+  namedVar(parser.prev);
+}
+
 static void unary() {
   TokenType opType = parser.prev.type;
 
@@ -279,7 +287,7 @@ ParseRule rules[] = {
   [TOKEN_GREATER_EQUAL] = {NULL, binary, PREC_COMP},
   [TOKEN_LESS] = {NULL, binary, PREC_COMP},
   [TOKEN_LESS_EQUAL] = {NULL, binary, PREC_COMP},
-  [TOKEN_ID] = {NULL, NULL, PREC_NONE},
+  [TOKEN_ID] = {variable, NULL, PREC_NONE},
   [TOKEN_STRING] = {string, NULL, PREC_NONE},
   [TOKEN_NUMBER] = {number, NULL, PREC_NONE},
   [TOKEN_AND] = {NULL, NULL, PREC_NONE},
@@ -337,6 +345,7 @@ static void varDecl() {
     emitByte(OP_NIL);
   }
   consume(TOKEN_SEMICOLON, "Expected' ';' in variable declaration");
+  defineVar(global);
 }
 
 static void exprStmt() {

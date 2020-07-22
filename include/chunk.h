@@ -24,6 +24,7 @@ typedef enum {
   OP_NOT,
   OP_NEGATE,
   OP_DEF_GLOBAL,
+  OP_GET_GLOBAL,
 } OpCode;
 
 // Main guy. Responsible for all relevant data
