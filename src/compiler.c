@@ -149,6 +149,20 @@ static void declaration();
 static ParseRule* getRule(TokenType type);
 static void parsePrec(Precedence prec);
 
+static uint8_t idConstant(Token* tok) {
+  return makeConstant(OBJ_VAL(copyStr(tok->start, tok->len)));
+}
+
+static uint8_t parseVar(const char* errMsg) {
+  consume(TOKEN_ID, errMsg);
+  return idConstant(&parser.prev);
+}
+
+static void defineVar(uint8_t global) {
+  emitBytes(OP_DEF_GLOBAL, global);
+}
+
+
 static void binary() {
   // store the operator
   TokenType opType = parser.prev.type;
@@ -314,6 +328,17 @@ static void expression() {
   parsePrec(PREC_ASSIGN);
 }
 
+static void varDecl() {
+  uint8_t global = parseVar("Expected variable name");
+
+  if (match(TOKEN_EQUAL)) {
+    expression();
+  } else {
+    emitByte(OP_NIL);
+  }
+  consume(TOKEN_SEMICOLON, "Expected' ';' in variable declaration");
+}
+
 static void exprStmt() {
   expression();
   consume(TOKEN_SEMICOLON, "Expected ';' in expression statement");
@@ -326,8 +351,38 @@ static void printStmt() {
   emitByte(OP_PRINT);
 }
 
+static void synchronize() {
+  parser.panicMode = false;
+
+  while (parser.curr.type != TOKEN_EOF) {
+    if (parser.prev.type == TOKEN_SEMICOLON) {
+      return;
+    }
+    switch (parser.curr.type) {
+      case TOKEN_CLASS:
+      case TOKEN_FUN:
+      case TOKEN_VAR:
+      case TOKEN_FOR:
+      case TOKEN_IF:
+      case TOKEN_WHILE:
+      case TOKEN_PRINT:
+      case TOKEN_RETURN:
+        return;
+      default: ;
+    }
+    advance();
+  }
+}
+
 static void declaration() {
-  statement();
+  if (match(TOKEN_VAR)) {
+    varDecl();
+  } else {
+    statement();
+  }
+  if (parser.panicMode) {
+    synchronize();
+  }
 }
 
 static void statement() {

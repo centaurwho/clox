@@ -17,9 +17,11 @@ void initVM() {
   resetStack(&vm.stack);
   vm.objects = NULL;
   initTable(&vm.strings);
+  initTable(&vm.globals);
 }
 
 void freeVM() {
+  freeTable(&vm.globals);
   freeTable(&vm.strings);
   freeObjects();
 }
@@ -74,6 +76,7 @@ static InterpretResult run() {
   #define READ_BYTE() (*vm.ip++)
   // TODO: handle reading long constants?
   #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
+  #define READ_STR() AS_STRING(READ_CONSTANT())
 
   #define BINARY_OP(type, op) \
     do { \
@@ -160,10 +163,16 @@ static InterpretResult run() {
       case OP_LESS:
         BINARY_OP(BOOL_VAL, <);
         break;
+      case OP_DEF_GLOBAL: {
+        ObjStr* name = READ_STR();
+        addEntry(&vm.globals, name, peek(0)); 
+        popVal();
+      }
     }
   }
   #undef READ_BYTE 
   #undef READ_CONSTANT 
+  #undef READ_STR
   #undef BINARY_OP
 }
 

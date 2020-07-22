@@ -23,6 +23,7 @@ typedef enum {
   OP_DIVIDE,
   OP_NOT,
   OP_NEGATE,
+  OP_DEF_GLOBAL,
 } OpCode;
 
 // Main guy. Responsible for all relevant data
