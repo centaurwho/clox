@@ -314,6 +314,12 @@ static void expression() {
   parsePrec(PREC_ASSIGN);
 }
 
+static void exprStmt() {
+  expression();
+  consume(TOKEN_SEMICOLON, "Expected ';' in expression statement");
+  emitByte(OP_POP);
+}
+
 static void printStmt() {
   expression();
   consume(TOKEN_SEMICOLON, "Expected ';' in print statement");
@@ -327,6 +333,8 @@ static void declaration() {
 static void statement() {
   if (match(TOKEN_PRINT)) {
     printStmt();
+  } else {
+    exprStmt();
   }
 }
 

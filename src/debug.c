@@ -93,6 +93,8 @@ int dissassembleInstr(Chunk* chunk, int off) {
       return simpleInstr("OP_RETURN", off);
     case OP_PRINT:
       return simpleInstr("OP_PRINT", off);
+    case OP_POP:
+      return simpleInstr("OP_POP", off);
     default:
       printf("Unknown opcode %d\n", instr);
       return off + 1;
