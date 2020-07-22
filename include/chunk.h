@@ -6,6 +6,7 @@
 
 // Instruction type
 typedef enum {
+  OP_PRINT,
   OP_RETURN,
   OP_CONSTANT,
   OP_CONSTANT_LONG,

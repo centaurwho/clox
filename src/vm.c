@@ -127,9 +127,11 @@ static InterpretResult run() {
       case OP_NOT:
         pushVal(BOOL_VAL(isFalsey(popVal())));
         break;
-      case OP_RETURN: 
+      case OP_PRINT:
         printValue(popVal());
         printf("\n");
+        break;
+      case OP_RETURN: 
         return INTERPRET_OK;
       case OP_CONSTANT:  
         pushVal(READ_CONSTANT());
