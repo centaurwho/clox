@@ -32,7 +32,7 @@ typedef enum {
   PREC_PRIMARY,
 } Precedence;
 
-typedef void (*ParseFn)();
+typedef void (*ParseFn)(bool canAssign);
 
 typedef struct {
   ParseFn prefix;
@@ -162,7 +162,7 @@ static void defineVar(uint8_t global) {
   emitBytes(OP_DEF_GLOBAL, global);
 }
 
-static void binary() {
+static void binary(bool canAssign) {
   // store the operator
   TokenType opType = parser.prev.type;
 
@@ -207,7 +207,7 @@ static void binary() {
   }
 }
 
-static void literal() {
+static void literal(bool canAssign) {
   switch (parser.prev.type) {
     case TOKEN_FALSE:
       emitByte(OP_FALSE);
@@ -223,32 +223,37 @@ static void literal() {
   }
 }
 
-static void grouping() {
+static void grouping(bool canAssign) {
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expected ')'");
 }
 
-static void number() {
+static void number(bool canAssign) {
   double val = strtod(parser.prev.start, NULL);
   emitConstant(NUM_VAL(val));
 }
 
 // TODO: Escape characters should be treated around here
-static void string() {
+static void string(bool canAssign) {
   emitConstant(OBJ_VAL(copyStr(parser.prev.start+1, 
           parser.prev.len - 2)));
 }
 
-static void namedVar(Token name) {
+static void namedVar(Token name, bool canAssign) {
   uint8_t arg = idConstant(&name);
-  emitBytes(OP_GET_GLOBAL, arg);
+  if (canAssign && match(TOKEN_EQUAL)) {
+    expression();
+    emitBytes(OP_SET_GLOBAL, arg);
+  } else {
+    emitBytes(OP_GET_GLOBAL, arg);
+  }
 }
 
-static void variable() {
-  namedVar(parser.prev);
+static void variable(bool canAssign) {
+  namedVar(parser.prev, canAssign);
 }
 
-static void unary() {
+static void unary(bool canAssign) {
   TokenType opType = parser.prev.type;
 
   // Compile the operand
@@ -319,12 +324,17 @@ static void parsePrec(Precedence prec) {
     return;
   } 
 
-  prefixRule();
+  bool canAssign = prec <= PREC_ASSIGN;
+  prefixRule(canAssign);
 
   while (prec <= getRule(parser.curr.type)->prec) {
     advance();
     ParseFn infixRule = getRule(parser.prev.type)->infix;
-    infixRule();
+    infixRule(canAssign);
+  }
+
+  if (canAssign && match(TOKEN_EQUAL)) {
+    error("Invalid assignment target");
   }
 }
 

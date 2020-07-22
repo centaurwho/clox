@@ -99,6 +99,8 @@ int dissassembleInstr(Chunk* chunk, int off) {
       return constInstr("OP_DEF_GLOBAL", chunk, off);
     case OP_GET_GLOBAL:
       return constInstr("OP_GET_GLOBAL", chunk, off);
+    case OP_SET_GLOBAL:
+      return constInstr("OP_SET_GLOBAL", chunk, off);
     default:
       printf("Unknown opcode %d\n", instr);
       return off + 1;

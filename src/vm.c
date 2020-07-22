@@ -179,7 +179,15 @@ static InterpretResult run() {
         pushVal(val);
         break;
       }
-
+      case OP_SET_GLOBAL: {
+        ObjStr* name = READ_STR();
+        if (addEntry(&vm.globals, name, peek(0))) {
+          delEntry(&vm.globals, name);
+          runtimeErr("Undefined variable '%s',", name->chars);
+          return INTERPRET_RUNTIME_ERROR;
+        }        
+        break;
+      }
     }
   }
   #undef READ_BYTE 

@@ -1,0 +1,5 @@
+var a = "hako";
+var b = a + "pako";
+a = "oof"
+
+print a + " " + b;
